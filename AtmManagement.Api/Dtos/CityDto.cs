@@ -1,0 +1,10 @@
+﻿namespace AtmManagement.Api.Dtos
+{
+    public class CityDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int PlateNumber { get; set; }
+    }
+
+}
