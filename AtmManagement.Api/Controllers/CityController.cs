@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using AtmManagement.Api.Entities;
 using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Validators;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -80,6 +81,13 @@ namespace AtmManagement.Api.Controllers
         [HttpPost("CreateCity")]
         public async Task<ActionResult<City>> PostCity(CityDto cityDto)
         {
+            var validator = new CityDtoValidator();
+            var validationResult = await validator.ValidateAsync(cityDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(x=>x.ErrorMessage));
+            }
+
             var city = new City();
             city.CityName = cityDto.Name;
             city.PlateNumber = cityDto.PlateNumber;

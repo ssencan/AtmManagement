@@ -20,6 +20,8 @@ namespace AtmManagement.Api.Data
             modelBuilder.ApplyConfiguration(new AtmConfiguration());
             modelBuilder.ApplyConfiguration(new CityConfiguration());
             modelBuilder.ApplyConfiguration(new DistrictConfiguration());
+
+
         }
     }
 }

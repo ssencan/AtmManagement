@@ -1,11 +1,14 @@
 using AtmManagement.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation.AspNetCore;
+using AtmManagement.Api.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+  
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
