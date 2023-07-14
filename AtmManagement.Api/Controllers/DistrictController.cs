@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using AtmManagement.Api.Entities;
 using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Validators;
+
 
 namespace AtmManagement.Api.Controllers
 {
@@ -64,6 +66,13 @@ namespace AtmManagement.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> PutDistrict(DistrictDto districtDto)
         {
+            var validator = new DistrictDtoValidator();
+            var validationResult = await validator.ValidateAsync(districtDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+            }
+
             var district = await _context.Districts.FindAsync(districtDto.Id);
             if (district == null)
             {
@@ -97,11 +106,18 @@ namespace AtmManagement.Api.Controllers
         [HttpPost("CreateDistrict")]
         public async Task<ActionResult<DistrictDto>> PostDistrict(DistrictDto districtDto)
         {
-            var district = new District
+            var validator = new DistrictDtoValidator();
+            var validationResult = await validator.ValidateAsync(districtDto);
+            if (!validationResult.IsValid)
             {
-                DistrictName = districtDto.Name,
-                CityID = districtDto.CityId
-            };
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+            }
+
+            var district = new District();//bak nasıl oluyor.
+
+            district.DistrictName = districtDto.Name;
+            district.CityID = districtDto.CityId;
+            
 
             _context.Districts.Add(district);
             await _context.SaveChangesAsync();

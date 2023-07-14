@@ -56,6 +56,13 @@ namespace AtmManagement.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> PutCity(CityDto cityDto)
         {
+            var validator = new CityDtoValidator();
+            var validationResult = await validator.ValidateAsync(cityDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+            }
+
             var city = await _context.Cities.FindAsync(cityDto.Id);
             if (!CityExists(city.ID))
             {
@@ -79,7 +86,7 @@ namespace AtmManagement.Api.Controllers
 
         // POST: api/Cities
         [HttpPost("CreateCity")]
-        public async Task<ActionResult<City>> PostCity(CityDto cityDto)
+        public async Task<ActionResult<CityDto>> PostCity(CityDto cityDto)
         {
             var validator = new CityDtoValidator();
             var validationResult = await validator.ValidateAsync(cityDto);

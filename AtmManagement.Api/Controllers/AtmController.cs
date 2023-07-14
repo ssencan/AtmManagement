@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using AtmManagement.Api.Entities;
 using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Validators;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -60,6 +61,13 @@ namespace AtmManagement.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> PutAtm(AtmDto atmDto)
         {
+            var validator = new AtmDtoValidator();
+            var validationResult = await validator.ValidateAsync(atmDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+            }
+
             var atm = await _context.Atms.FindAsync(atmDto.Id);
             if (atm == null)
             {
@@ -98,6 +106,13 @@ namespace AtmManagement.Api.Controllers
         [HttpPost("CreateAtm")]
         public async Task<ActionResult<AtmDto>> CreateAtm(AtmDto atmDto)
         {
+            var validator = new AtmDtoValidator();
+            var validationResult = await validator.ValidateAsync(atmDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+            }
+
             var atm = new Atm
             {
                 AtmName = atmDto.AtmName,
