@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using AtmManagement.Api.Entities;
-using AtmManagement.Api.Data;
+﻿using AtmManagement.Api.Data.Repositories;
 using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Entities;
 using AtmManagement.Api.Validators;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -11,41 +12,43 @@ namespace AtmManagement.Api.Controllers
     [ApiController]
     public class AtmController : ControllerBase
     {
-        private readonly AtmDbContext _context;
+        private readonly IRepository<Atm> _atmRepository;
 
-        public AtmController(AtmDbContext context)
+        public AtmController(IRepository<Atm> atmRepository)
         {
-            _context = context;
+            _atmRepository = atmRepository;
         }
 
         // GET: api/Atms
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AtmDto>>> GetAtms()
         {
-            return await _context.Atms.Select(a => new AtmDto
+            var atms = await _atmRepository.GetAllAsync();
+            var atmDtos = atms.Select(atm => new AtmDto
             {
-                Id = a.ID,
-                AtmName = a.AtmName,
-                Latitude = a.Latitude,
-                Longitude = a.Longitude,
-                IsActive = a.IsActive,
-                CityID = a.CityID,
-                DistrictID = a.DistrictID
-            }).ToListAsync();
+                Id = atm.ID,
+                AtmName = atm.AtmName,
+                Latitude = atm.Latitude,
+                Longitude = atm.Longitude,
+                IsActive = atm.IsActive,
+                CityID = atm.CityID,
+                DistrictID = atm.DistrictID
+            });
+            return Ok(atmDtos);
         }
 
         // GET: api/Atms/id
         [HttpGet("{id}")]
         public async Task<ActionResult<AtmDto>> GetAtm(int id)
         {
-            var atm = await _context.Atms.FindAsync(id);
+            var atm = await _atmRepository.GetByIdAsync(id);
 
             if (atm == null)
             {
                 return NotFound();
             }
 
-            return new AtmDto
+            var atmDto = new AtmDto
             {
                 Id = atm.ID,
                 AtmName = atm.AtmName,
@@ -55,6 +58,7 @@ namespace AtmManagement.Api.Controllers
                 CityID = atm.CityID,
                 DistrictID = atm.DistrictID
             };
+            return Ok(atmDto);
         }
 
         // PUT: api/Atms/id
@@ -68,7 +72,7 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var atm = await _context.Atms.FindAsync(atmDto.Id);
+            var atm = await _atmRepository.GetByIdAsync(atmDto.Id);
             if (atm == null)
             {
                 return NotFound();
@@ -81,30 +85,14 @@ namespace AtmManagement.Api.Controllers
             atm.CityID = atmDto.CityID;
             atm.DistrictID = atmDto.DistrictID;
 
-            _context.Entry(atm).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AtmExists(atmDto.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _atmRepository.UpdateAsync(atm);
 
             return NoContent();
         }
 
         // POST: api/Atms
         [HttpPost("CreateAtm")]
-        public async Task<ActionResult<AtmDto>> CreateAtm(AtmDto atmDto)
+        public async Task<ActionResult<AtmDto>> PostAtm(AtmDto atmDto)
         {
             var validator = new AtmDtoValidator();
             var validationResult = await validator.ValidateAsync(atmDto);
@@ -123,8 +111,7 @@ namespace AtmManagement.Api.Controllers
                 DistrictID = atmDto.DistrictID
             };
 
-            _context.Atms.Add(atm);
-            await _context.SaveChangesAsync();
+            await _atmRepository.AddAsync(atm);
 
             return CreatedAtAction(nameof(GetAtm), new { id = atm.ID }, atmDto);
         }
@@ -133,22 +120,15 @@ namespace AtmManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAtm(int id)
         {
-            var atm = await _context.Atms.FindAsync(id);
+            var atm = await _atmRepository.GetByIdAsync(id);
             if (atm == null)
             {
                 return NotFound();
             }
 
-            _context.Atms.Remove(atm);
-            await _context.SaveChangesAsync();
+            await _atmRepository.DeleteAsync(atm.ID);
 
             return NoContent();
-        }
-
-
-        private bool AtmExists(int id)
-        {
-            return (_context.Atms?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

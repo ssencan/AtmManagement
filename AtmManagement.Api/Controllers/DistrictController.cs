@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using AtmManagement.Api.Entities;
-using AtmManagement.Api.Data;
+﻿using AtmManagement.Api.Data.Repositories;
 using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Entities;
 using AtmManagement.Api.Validators;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -12,24 +10,24 @@ namespace AtmManagement.Api.Controllers
     [ApiController]
     public class DistrictController : ControllerBase
     {
-        private readonly AtmDbContext _context;
+        private readonly IRepository<District> _districtRepository;
 
-        public DistrictController(AtmDbContext context)
+        public DistrictController(IRepository<District> districtRepository)
         {
-            _context = context;
+            _districtRepository = districtRepository;
         }
 
         // GET: api/District
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DistrictDto>>> GetDistricts()
         {
-            var districts = await _context.Districts
-                 .Select(d => new DistrictDto
-                 {
-                     Id = d.ID,
-                     Name = d.DistrictName,
-                     CityId = d.CityID
-                 }).ToListAsync();
+            var districts = (await _districtRepository.GetAllAsync())
+                .Select(d => new DistrictDto
+                {
+                    Id = d.ID,
+                    Name = d.DistrictName,
+                    CityId = d.CityID
+                }).ToList();
 
             if (!districts.Any())
             {
@@ -43,26 +41,24 @@ namespace AtmManagement.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DistrictDto>> GetDistrict(int id)
         {
-            var district = await _context.Districts
-                       .Select(d => new DistrictDto
-                       {
-                           Id = d.ID,
-                           Name = d.DistrictName,
-                           CityId = d.CityID
-                       })
-                       .FirstOrDefaultAsync(d => d.Id == id);
+            var districtEntity = await _districtRepository.GetByIdAsync(id);
 
-            if (district == null)
+            if (districtEntity == null)
             {
                 return NotFound();
             }
 
+            var district = new DistrictDto
+            {
+                Id = districtEntity.ID,
+                Name = districtEntity.DistrictName,
+                CityId = districtEntity.CityID
+            };
+
             return district;
         }
 
-
         // PUT: api/District/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         public async Task<IActionResult> PutDistrict(DistrictDto districtDto)
         {
@@ -73,35 +69,20 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var district = await _context.Districts.FindAsync(districtDto.Id);
-            if (district == null)
+            var districtEntity = await _districtRepository.GetByIdAsync(districtDto.Id);
+            if (districtEntity == null)
             {
                 return NotFound();
             }
 
-            district.DistrictName = districtDto.Name;
-            district.CityID = districtDto.CityId;
+            districtEntity.DistrictName = districtDto.Name;
+            districtEntity.CityID = districtDto.CityId;
 
-            _context.Entry(district).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DistrictExists(districtDto.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _districtRepository.UpdateAsync(districtEntity);
 
             return NoContent();
         }
+
         // POST: api/District
         [HttpPost("CreateDistrict")]
         public async Task<ActionResult<DistrictDto>> PostDistrict(DistrictDto districtDto)
@@ -113,37 +94,30 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var district = new District();//bak nasıl oluyor.
+            var districtEntity = new District
+            {
+                DistrictName = districtDto.Name,
+                CityID = districtDto.CityId
+            };
 
-            district.DistrictName = districtDto.Name;
-            district.CityID = districtDto.CityId;
-            
+            await _districtRepository.AddAsync(districtEntity);
 
-            _context.Districts.Add(district);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetDistrict), new { id = district.ID }, districtDto);
+            return CreatedAtAction(nameof(GetDistrict), new { id = districtEntity.ID }, districtDto);
         }
 
         // DELETE: api/District/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDistrict(int id)
         {
-            var district = await _context.Districts.FindAsync(id);
-            if (district == null)
+            var districtEntity = await _districtRepository.GetByIdAsync(id);
+            if (districtEntity == null)
             {
                 return NotFound();
             }
 
-            _context.Districts.Remove(district);
-            await _context.SaveChangesAsync();
+            await _districtRepository.DeleteAsync(id);
 
             return NoContent();
-        }
-
-        private bool DistrictExists(int id)
-        {
-            return (_context.Districts?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

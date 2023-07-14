@@ -8,7 +8,7 @@ namespace AtmManagement.Api.Validators
         public CityDtoValidator()
         {
             RuleFor(city => city.Name).NotEmpty().WithMessage("CityName is required.");
-            RuleFor(city => city.PlateNumber).GreaterThan(0).WithMessage("PlateNumber must be greater than 90.");
+            RuleFor(city => city.PlateNumber).GreaterThan(0).WithMessage("PlateNumber must be greater than 0.");
         }
     }
 }

@@ -6,11 +6,7 @@ namespace AtmManagement.Api.Validators
     public class AtmDtoValidator : AbstractValidator<AtmDto>
     {
         public AtmDtoValidator()
-        {
-            RuleFor(a => a.Id)
-            .NotEmpty()
-            .WithMessage("ID cannot be empty");
-
+        {    
             RuleFor(a => a.AtmName)
                 .NotEmpty()
                 .WithMessage("AtmName cannot be empty")

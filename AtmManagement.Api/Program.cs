@@ -1,7 +1,8 @@
 using AtmManagement.Api.Data;
+using AtmManagement.Api.Data.Repositories;
+using AtmManagement.Api.Entities;
 using Microsoft.EntityFrameworkCore;
-using FluentValidation.AspNetCore;
-using AtmManagement.Api.Validators;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,11 @@ builder.Services.AddSwaggerGen();
 //Dependency Injection of DbContext Class
 builder.Services.AddDbContext<AtmDbContext>(options => 
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Adding the repository to the DI container
+builder.Services.AddScoped<IRepository<City>, CityRepository>();
+builder.Services.AddScoped<IRepository<District>, DistrictRepository>();
+builder.Services.AddScoped<IRepository<Atm>, AtmRepository>();
 
 var app = builder.Build();
 

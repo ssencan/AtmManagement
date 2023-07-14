@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using AtmManagement.Api.Entities;
-using AtmManagement.Api.Data;
+﻿using AtmManagement.Api.Data.Repositories;
 using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Entities;
 using AtmManagement.Api.Validators;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -11,18 +10,18 @@ namespace AtmManagement.Api.Controllers
     [ApiController]
     public class CityController : ControllerBase
     {
-        private readonly AtmDbContext _context;
+        private readonly IRepository<City> _cityRepository;
 
-        public CityController(AtmDbContext context)
+        public CityController(IRepository<City> cityRepository)
         {
-            _context = context;
+            _cityRepository = cityRepository;
         }
 
         // GET: api/Cities
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CityDto>>> GetCities()
         {
-            var cities = await _context.Cities.ToListAsync();
+            var cities = await _cityRepository.GetAllAsync();
             var cityDtos = cities.Select(city => new CityDto
             {
                 Id = city.ID,
@@ -36,7 +35,7 @@ namespace AtmManagement.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<City>> GetCity(int id)
         {
-            var city = await _context.Cities.FindAsync(id);
+            var city = await _cityRepository.GetByIdAsync(id);
 
             if (city == null)
             {
@@ -63,23 +62,15 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var city = await _context.Cities.FindAsync(cityDto.Id);
-            if (!CityExists(city.ID))
+            var city = await _cityRepository.GetByIdAsync(cityDto.Id);
+            if (city == null)
             {
                 return NotFound();
             }
             city.CityName = cityDto.Name;
             city.PlateNumber = cityDto.PlateNumber;
-            _context.Entry(city).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
-            }
+            await _cityRepository.UpdateAsync(city);
 
             return NoContent();
         }
@@ -92,15 +83,14 @@ namespace AtmManagement.Api.Controllers
             var validationResult = await validator.ValidateAsync(cityDto);
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors.Select(x=>x.ErrorMessage));
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
             var city = new City();
             city.CityName = cityDto.Name;
             city.PlateNumber = cityDto.PlateNumber;
 
-            _context.Cities.Add(city);
-            await _context.SaveChangesAsync();
+            await _cityRepository.AddAsync(city);
 
             return CreatedAtAction(nameof(GetCity), new { id = city.ID }, cityDto);
         }
@@ -109,21 +99,15 @@ namespace AtmManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCity(int id)
         {
-            var city = await _context.Cities.FindAsync(id);
+            var city = await _cityRepository.GetByIdAsync(id);
             if (city == null)
             {
                 return NotFound();
             }
 
-            _context.Cities.Remove(city);
-            await _context.SaveChangesAsync();
+            await _cityRepository.DeleteAsync(city.ID);
 
             return NoContent();
-        }
-
-        private bool CityExists(int id)
-        {
-            return _context.Cities.Any(e => e.ID == id);
         }
     }
 }
