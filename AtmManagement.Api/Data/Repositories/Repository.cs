@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using System.Threading.Tasks;
 
 namespace AtmManagement.Api.Data.Repositories
-
 {
-    public class BaseRepository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly AtmDbContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public BaseRepository(AtmDbContext context)
+        public Repository(AtmDbContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();
@@ -25,25 +24,35 @@ namespace AtmManagement.Api.Data.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task AddAsync(T entity)
+        public void Add(T entity)
         {
             _dbSet.Add(entity);
-            await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(T entity)
+        public void Update(T entity)
         {
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public void Delete(T entity)
         {
-            var entity = await GetByIdAsync(id);
             _dbSet.Remove(entity);
+        }
+
+        public Task AddAsync(T entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task CommitAsync()
+        {
             await _context.SaveChangesAsync();
         }
     }
-
 }

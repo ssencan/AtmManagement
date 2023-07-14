@@ -1,4 +1,4 @@
-﻿using AtmManagement.Api.Data.Repositories;
+﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
 using AtmManagement.Api.Entities;
 using AtmManagement.Api.Validators;
@@ -10,18 +10,18 @@ namespace AtmManagement.Api.Controllers
     [ApiController]
     public class CityController : ControllerBase
     {
-        private readonly IRepository<City> _cityRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CityController(IRepository<City> cityRepository)
+        public CityController(IUnitOfWork unitOfWork)
         {
-            _cityRepository = cityRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Cities
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CityDto>>> GetCities()
         {
-            var cities = await _cityRepository.GetAllAsync();
+            var cities = await _unitOfWork.Cities.GetAllAsync();
             var cityDtos = cities.Select(city => new CityDto
             {
                 Id = city.ID,
@@ -35,7 +35,7 @@ namespace AtmManagement.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<City>> GetCity(int id)
         {
-            var city = await _cityRepository.GetByIdAsync(id);
+            var city = await _unitOfWork.Cities.GetByIdAsync(id);
 
             if (city == null)
             {
@@ -62,15 +62,14 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var city = await _cityRepository.GetByIdAsync(cityDto.Id);
+            var city = await _unitOfWork.Cities.GetByIdAsync(cityDto.Id);
             if (city == null)
             {
                 return NotFound();
             }
             city.CityName = cityDto.Name;
             city.PlateNumber = cityDto.PlateNumber;
-
-            await _cityRepository.UpdateAsync(city);
+            await _unitOfWork.SaveChangesAsync();
 
             return NoContent();
         }
@@ -90,7 +89,8 @@ namespace AtmManagement.Api.Controllers
             city.CityName = cityDto.Name;
             city.PlateNumber = cityDto.PlateNumber;
 
-            await _cityRepository.AddAsync(city);
+            await _unitOfWork.Cities.AddAsync(city);
+            await _unitOfWork.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetCity), new { id = city.ID }, cityDto);
         }
@@ -99,13 +99,14 @@ namespace AtmManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCity(int id)
         {
-            var city = await _cityRepository.GetByIdAsync(id);
+            var city = await _unitOfWork.Cities.GetByIdAsync(id);
             if (city == null)
             {
                 return NotFound();
             }
 
-            await _cityRepository.DeleteAsync(city.ID);
+            await _unitOfWork.Cities.DeleteAsync(city.ID);
+            await _unitOfWork.SaveChangesAsync();
 
             return NoContent();
         }

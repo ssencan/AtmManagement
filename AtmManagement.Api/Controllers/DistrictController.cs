@@ -1,8 +1,10 @@
-﻿using AtmManagement.Api.Data.Repositories;
+﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
 using AtmManagement.Api.Entities;
 using AtmManagement.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -10,18 +12,18 @@ namespace AtmManagement.Api.Controllers
     [ApiController]
     public class DistrictController : ControllerBase
     {
-        private readonly IRepository<District> _districtRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DistrictController(IRepository<District> districtRepository)
+        public DistrictController(IUnitOfWork unitOfWork)
         {
-            _districtRepository = districtRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/District
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DistrictDto>>> GetDistricts()
         {
-            var districts = (await _districtRepository.GetAllAsync())
+            var districts = (await _unitOfWork.Districts.GetAllAsync())
                 .Select(d => new DistrictDto
                 {
                     Id = d.ID,
@@ -41,7 +43,7 @@ namespace AtmManagement.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DistrictDto>> GetDistrict(int id)
         {
-            var districtEntity = await _districtRepository.GetByIdAsync(id);
+            var districtEntity = await _unitOfWork.Districts.GetByIdAsync(id);
 
             if (districtEntity == null)
             {
@@ -69,7 +71,7 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var districtEntity = await _districtRepository.GetByIdAsync(districtDto.Id);
+            var districtEntity = await _unitOfWork.Districts.GetByIdAsync(districtDto.Id);
             if (districtEntity == null)
             {
                 return NotFound();
@@ -78,7 +80,7 @@ namespace AtmManagement.Api.Controllers
             districtEntity.DistrictName = districtDto.Name;
             districtEntity.CityID = districtDto.CityId;
 
-            await _districtRepository.UpdateAsync(districtEntity);
+            await _unitOfWork.SaveChangesAsync();
 
             return NoContent();
         }
@@ -100,7 +102,8 @@ namespace AtmManagement.Api.Controllers
                 CityID = districtDto.CityId
             };
 
-            await _districtRepository.AddAsync(districtEntity);
+            await _unitOfWork.Districts.AddAsync(districtEntity);
+            await _unitOfWork.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetDistrict), new { id = districtEntity.ID }, districtDto);
         }
@@ -109,13 +112,14 @@ namespace AtmManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDistrict(int id)
         {
-            var districtEntity = await _districtRepository.GetByIdAsync(id);
+            var districtEntity = await _unitOfWork.Districts.GetByIdAsync(id);
             if (districtEntity == null)
             {
                 return NotFound();
             }
 
-            await _districtRepository.DeleteAsync(id);
+            await _unitOfWork.Districts.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync();
 
             return NoContent();
         }

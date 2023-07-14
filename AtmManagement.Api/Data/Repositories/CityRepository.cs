@@ -1,7 +1,7 @@
 ﻿using AtmManagement.Api.Entities;
 namespace AtmManagement.Api.Data.Repositories
 {
-    public class CityRepository : BaseRepository<City>, IRepository<City>
+    public class CityRepository : Repository<City>, IRepository<City>
     {
         public CityRepository(AtmDbContext context) : base(context)
         {
