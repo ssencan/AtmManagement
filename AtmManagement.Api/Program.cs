@@ -1,6 +1,7 @@
 using AtmManagement.Api.Data;
 using AtmManagement.Api.Data.Repositories;
 using AtmManagement.Api.Entities;
+using AtmManagement.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -19,13 +20,12 @@ builder.Services.AddDbContext<AtmDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Adding the repository to the DI container
-builder.Services.AddScoped(typeof(Repository<>));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IRepository<City>, CityRepository>();
 builder.Services.AddScoped<IRepository<District>, DistrictRepository>();
 builder.Services.AddScoped<IAtmRepository, AtmRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+builder.Services.AddScoped<IAtmService, AtmService>();
 
 var app = builder.Build();
 

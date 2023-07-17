@@ -105,7 +105,7 @@ namespace AtmManagement.Api.Controllers
                 return NotFound();
             }
 
-            await _unitOfWork.Cities.DeleteAsync(city.ID);
+            _unitOfWork.Cities.Delete(city);
             await _unitOfWork.SaveChangesAsync();
 
             return NoContent();

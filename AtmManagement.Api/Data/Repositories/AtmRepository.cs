@@ -92,9 +92,8 @@ namespace AtmManagement.Api.Data.Repositories
                 return;
 
             Delete(atm);
-            await CommitAsync();
+           
         }
-
 
         // Atm-specific methods can be added here
     }

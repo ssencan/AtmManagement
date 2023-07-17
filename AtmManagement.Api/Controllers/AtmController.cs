@@ -1,6 +1,7 @@
 ﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
 using AtmManagement.Api.Entities;
+using AtmManagement.Api.Services;
 using AtmManagement.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -13,10 +14,13 @@ namespace AtmManagement.Api.Controllers
     public class AtmController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAtmService _atmService;
 
-        public AtmController(IUnitOfWork unitOfWork)
+
+        public AtmController(IUnitOfWork unitOfWork, IAtmService atmService)
         {
             _unitOfWork = unitOfWork;
+            _atmService = atmService;
         }
 
         // GET: api/Atms
@@ -70,10 +74,9 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            await _unitOfWork.Atms.AddAtm(atmDto);
-            await _unitOfWork.SaveChangesAsync();
+            var result = await _atmService.Add(atmDto);
 
-            return CreatedAtAction(nameof(GetAtm), new { id = atmDto.Id }, atmDto);
+            return CreatedAtAction(nameof(GetAtm), new { id = result.Id }, result);
         }
 
         // DELETE: api/Atms/id

@@ -9,7 +9,8 @@ namespace AtmManagement.Api.Data.Repositories
         Task<IEnumerable<T>> GetAllAsync();
         Task AddAsync(T entity);
         void Update(T entity);
-        Task DeleteAsync(int id);
+        void Delete(T entity);
+        void Add(T entity);
         Task CommitAsync();
         // other methods...
     }

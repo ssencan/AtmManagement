@@ -118,7 +118,7 @@ namespace AtmManagement.Api.Controllers
                 return NotFound();
             }
 
-            await _unitOfWork.Districts.DeleteAsync(id);
+            _unitOfWork.Districts.Delete(districtEntity);
             await _unitOfWork.SaveChangesAsync();
 
             return NoContent();

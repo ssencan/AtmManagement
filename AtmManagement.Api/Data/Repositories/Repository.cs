@@ -40,14 +40,10 @@ namespace AtmManagement.Api.Data.Repositories
             _dbSet.Remove(entity);
         }
 
-        public Task AddAsync(T entity)
+        public async Task AddAsync(T entity)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
+            
+           await _dbSet.AddAsync(entity);
         }
 
         public async Task CommitAsync()
