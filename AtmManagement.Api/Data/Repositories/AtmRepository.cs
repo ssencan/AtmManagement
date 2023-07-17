@@ -30,6 +30,72 @@ namespace AtmManagement.Api.Data.Repositories
             return await query.ToListAsync();
         }
 
+        public async Task<AtmDto> GetAtmById(int id)
+        {
+            var atm = await GetByIdAsync(id);
+
+            if (atm == null)
+                return null;
+
+            var atmDto = new AtmDto
+            {
+                Id = atm.ID,
+                AtmName = atm.AtmName,
+                Latitude = atm.Latitude,
+                Longitude = atm.Longitude,
+                IsActive = atm.IsActive,
+                CityID = atm.CityID,
+                DistrictID = atm.DistrictID
+            };
+
+            return atmDto;
+        }
+
+        public async Task UpdateAtm(AtmDto atmDto)
+        {
+            var atm = await GetByIdAsync(atmDto.Id);
+
+            if (atm == null)
+                return;
+
+            atm.AtmName = atmDto.AtmName;
+            atm.Latitude = atmDto.Latitude;
+            atm.Longitude = atmDto.Longitude;
+            atm.IsActive = atmDto.IsActive;
+            atm.CityID = atmDto.CityID;
+            atm.DistrictID = atmDto.DistrictID;
+
+            Update(atm);
+        }
+
+        public async Task AddAtm(AtmDto atmDto)
+        {
+            var atm = new Atm
+            {
+                AtmName = atmDto.AtmName,
+                Latitude = atmDto.Latitude,
+                Longitude = atmDto.Longitude,
+                IsActive = atmDto.IsActive,
+                CityID = atmDto.CityID,
+                DistrictID = atmDto.DistrictID
+            };
+
+            Add(atm);
+            await CommitAsync();
+        }
+
+        public async Task DeleteAtm(int id)
+        {
+            var atm = await GetByIdAsync(id);
+
+            if (atm == null)
+                return;
+
+            Delete(atm);
+            await CommitAsync();
+        }
+
+
         // Atm-specific methods can be added here
     }
 
