@@ -65,6 +65,7 @@ namespace AtmManagement.Api.Data.Repositories
             atm.CityID = atmDto.CityID;
             atm.DistrictID = atmDto.DistrictID;
 
+
             Update(atm);
         }
 

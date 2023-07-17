@@ -1,11 +1,8 @@
 ﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
-using AtmManagement.Api.Entities;
 using AtmManagement.Api.Services;
 using AtmManagement.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -13,13 +10,11 @@ namespace AtmManagement.Api.Controllers
     [ApiController]
     public class AtmController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IAtmService _atmService;
 
 
-        public AtmController(IUnitOfWork unitOfWork, IAtmService atmService)
+        public AtmController(IAtmService atmService)
         {
-            _unitOfWork = unitOfWork;
             _atmService = atmService;
         }
 
@@ -27,7 +22,7 @@ namespace AtmManagement.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AtmDto>>> GetAtms()
         {
-            var atms = await _unitOfWork.Atms.GetAllAtm();
+            var atms = await _atmService.GetAllAtm();
 
             return Ok(atms);
         }
@@ -36,7 +31,7 @@ namespace AtmManagement.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AtmDto>> GetAtm(int id)
         {
-            var atmDto = await _unitOfWork.Atms.GetAtmById(id);
+            var atmDto = await _atmService.GetAtmById(id);
 
             if (atmDto == null)
             {
@@ -56,11 +51,16 @@ namespace AtmManagement.Api.Controllers
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
+            try
+            {
+                await _atmService.UpdateAtm(atmDto);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            await _unitOfWork.Atms.UpdateAtm(atmDto);
-            await _unitOfWork.SaveChangesAsync();
-
-            return NoContent();
         }
 
         // POST: api/Atms/CreateAtm
@@ -83,8 +83,7 @@ namespace AtmManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAtm(int id)
         {
-            await _unitOfWork.Atms.DeleteAtm(id);
-            await _unitOfWork.SaveChangesAsync();
+            await _atmService.DeleteAtm(id);
 
             return NoContent();
         }
