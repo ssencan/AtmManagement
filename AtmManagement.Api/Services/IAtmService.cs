@@ -7,7 +7,7 @@ namespace AtmManagement.Api.Services
         Task<IEnumerable<AtmDto>> GetAllAtm();
         Task<AtmDto> GetAtmById(int id);
         Task UpdateAtm(AtmDto atmDto);
-        Task<AtmDto> Add(AtmDto atmDto);
+        Task<AtmDto> AddAtm(AtmDto atmDto);
         Task DeleteAtm(int id);
     }
 }

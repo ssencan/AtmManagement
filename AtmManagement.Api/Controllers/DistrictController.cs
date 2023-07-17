@@ -1,10 +1,7 @@
-﻿using AtmManagement.Api.Data;
-using AtmManagement.Api.Dtos;
-using AtmManagement.Api.Entities;
+﻿using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Services;
 using AtmManagement.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -12,52 +9,39 @@ namespace AtmManagement.Api.Controllers
     [ApiController]
     public class DistrictController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDistrictService _districtService;
 
-        public DistrictController(IUnitOfWork unitOfWork)
+        public DistrictController(IDistrictService districtService)
         {
-            _unitOfWork = unitOfWork;
+            _districtService = districtService;
         }
 
         // GET: api/District
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DistrictDto>>> GetDistricts()
+        public async Task<ActionResult<IEnumerable<DistrictDto>>> GetAllDistricts()
         {
-            var districts = (await _unitOfWork.Districts.GetAllAsync())
-                .Select(d => new DistrictDto
-                {
-                    Id = d.ID,
-                    Name = d.DistrictName,
-                    CityId = d.CityID
-                }).ToList();
+            var districts = await _districtService.GetAllDistrict();
 
             if (!districts.Any())
             {
                 return NotFound();
             }
 
-            return districts;
+            return Ok(districts);
         }
 
         // GET: api/District/5
         [HttpGet("{id}")]
         public async Task<ActionResult<DistrictDto>> GetDistrict(int id)
         {
-            var districtEntity = await _unitOfWork.Districts.GetByIdAsync(id);
+            var districtDto = await _districtService.GetDistrictById(id);
 
-            if (districtEntity == null)
+            if (districtDto == null)
             {
                 return NotFound();
             }
 
-            var district = new DistrictDto
-            {
-                Id = districtEntity.ID,
-                Name = districtEntity.DistrictName,
-                CityId = districtEntity.CityID
-            };
-
-            return district;
+            return Ok(districtDto);
         }
 
         // PUT: api/District/5
@@ -71,18 +55,15 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var districtEntity = await _unitOfWork.Districts.GetByIdAsync(districtDto.Id);
-            if (districtEntity == null)
+            try
             {
-                return NotFound();
+                await _districtService.UpdateDistrict(districtDto);
+                return NoContent();
             }
-
-            districtEntity.DistrictName = districtDto.Name;
-            districtEntity.CityID = districtDto.CityId;
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST: api/District
@@ -96,30 +77,16 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var districtEntity = new District
-            {
-                DistrictName = districtDto.Name,
-                CityID = districtDto.CityId
-            };
+            var result = await _districtService.AddDistrict(districtDto);
 
-            await _unitOfWork.Districts.AddAsync(districtEntity);
-            await _unitOfWork.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetDistrict), new { id = districtEntity.ID }, districtDto);
+            return CreatedAtAction(nameof(GetDistrict), new { id = result.Id }, result);
         }
 
         // DELETE: api/District/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDistrict(int id)
         {
-            var districtEntity = await _unitOfWork.Districts.GetByIdAsync(id);
-            if (districtEntity == null)
-            {
-                return NotFound();
-            }
-
-            _unitOfWork.Districts.Delete(districtEntity);
-            await _unitOfWork.SaveChangesAsync();
+            await _districtService.DeleteDistrict(id);
 
             return NoContent();
         }

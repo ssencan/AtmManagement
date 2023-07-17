@@ -5,10 +5,10 @@ namespace AtmManagement.Api.Data.Repositories
 {
     public interface IDistrictRepository : IRepository<District>
     {
-        Task<IEnumerable<DistrictDto>> GetAllAtm();
-        Task<DistrictDto> GetAtmById(int id);
-        Task UpdateAtm(DistrictDto atmDto);
-        Task AddAtm(DistrictDto atmDto);
-        Task DeleteAtm(int id);
+        Task<IEnumerable<DistrictDto>> GetAllDistrict();
+        Task<DistrictDto> GetDistrictById(int id);
+        Task UpdateDistrict(DistrictDto atmDto);
+        Task AddDistrict(DistrictDto atmDto);
+        Task DeleteDistrict(int id);
     }
 }

@@ -21,11 +21,12 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 
 // Adding the repository to the DI container
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IRepository<City>, CityRepository>();
-builder.Services.AddScoped<IRepository<District>, DistrictRepository>();
+builder.Services.AddScoped<ICityRepository, CityRepository>();
+builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
 builder.Services.AddScoped<IAtmRepository, AtmRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAtmService, AtmService>();
+builder.Services.AddScoped<IDistrictService, DistrictService>();
 
 var app = builder.Build();
 

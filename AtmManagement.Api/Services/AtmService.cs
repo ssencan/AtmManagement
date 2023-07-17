@@ -48,5 +48,10 @@ namespace AtmManagement.Api.Services
             await _unitOfWork.Atms.DeleteAtm(id);
             await _unitOfWork.SaveChangesAsync();
         }
+
+        public Task<AtmDto> AddAtm(AtmDto atmDto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

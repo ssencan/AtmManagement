@@ -27,7 +27,7 @@ namespace AtmManagement.Api.Data
 
 
 
-        public IRepository<District> Districts
+        public IDistrictRepository Districts
         {
             get
             {
@@ -45,7 +45,7 @@ namespace AtmManagement.Api.Data
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _context.Dispose();
         }
 
         public async Task SaveChangesAsync()

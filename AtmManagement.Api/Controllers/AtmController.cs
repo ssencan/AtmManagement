@@ -74,7 +74,7 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var result = await _atmService.Add(atmDto);
+            var result = await _atmService.AddAtm(atmDto);
 
             return CreatedAtAction(nameof(GetAtm), new { id = result.Id }, result);
         }

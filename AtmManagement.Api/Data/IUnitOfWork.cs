@@ -8,7 +8,7 @@ namespace AtmManagement.Api.Data
     {
         IRepository<City> Cities { get; }
         IAtmRepository Atms { get; }
-        IRepository<District> Districts { get; }
+        IDistrictRepository Districts { get; }
         // Other repositories...
 
         Task SaveChangesAsync();
