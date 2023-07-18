@@ -1,6 +1,5 @@
-﻿using AtmManagement.Api.Data;
-using AtmManagement.Api.Dtos;
-using AtmManagement.Api.Entities;
+﻿using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Services;
 using AtmManagement.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,48 +9,36 @@ namespace AtmManagement.Api.Controllers
     [ApiController]
     public class CityController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICityService _cityService;
 
-        public CityController(IUnitOfWork unitOfWork)
+        public CityController(ICityService cityService)
         {
-            _unitOfWork = unitOfWork;
+            _cityService = cityService;
         }
 
         // GET: api/Cities
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CityDto>>> GetCities()
         {
-            var cities = await _unitOfWork.Cities.GetAllAsync();
-            var cityDtos = cities.Select(city => new CityDto
-            {
-                Id = city.ID,
-                Name = city.CityName,
-                PlateNumber = city.PlateNumber
-            });
-            return Ok(cityDtos);
+            var cities = await _cityService.GetAllCity();
+            return Ok(cities);
         }
 
         // GET: api/Cities/id
         [HttpGet("{id}")]
-        public async Task<ActionResult<City>> GetCity(int id)
+        public async Task<ActionResult<CityDto>> GetCity(int id)
         {
-            var city = await _unitOfWork.Cities.GetByIdAsync(id);
+            var cityDto = await _cityService.GetCityById(id);
 
-            if (city == null)
+            if (cityDto == null)
             {
                 return NotFound();
             }
 
-            var cityDto = new CityDto
-            {
-                Id = city.ID,
-                Name = city.CityName,
-                PlateNumber = city.PlateNumber
-            };
             return Ok(cityDto);
         }
 
-        // PUT: api/Cities/id
+        // PUT: api/Cities
         [HttpPut]
         public async Task<IActionResult> PutCity(CityDto cityDto)
         {
@@ -61,20 +48,18 @@ namespace AtmManagement.Api.Controllers
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
-
-            var city = await _unitOfWork.Cities.GetByIdAsync(cityDto.Id);
-            if (city == null)
+            try
             {
-                return NotFound();
+                await _cityService.UpdateCity(cityDto);
+                return NoContent();
             }
-            city.CityName = cityDto.Name;
-            city.PlateNumber = cityDto.PlateNumber;
-            await _unitOfWork.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // POST: api/Cities
+        // POST: api/Cities/CreateCity
         [HttpPost("CreateCity")]
         public async Task<ActionResult<CityDto>> PostCity(CityDto cityDto)
         {
@@ -85,30 +70,24 @@ namespace AtmManagement.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
 
-            var city = new City();
-            city.CityName = cityDto.Name;
-            city.PlateNumber = cityDto.PlateNumber;
+            var result = await _cityService.AddCity(cityDto);
 
-            await _unitOfWork.Cities.AddAsync(city);
-            await _unitOfWork.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetCity), new { id = city.ID }, cityDto);
+            return CreatedAtAction(nameof(GetCity), new { id = result.Id }, result);
         }
 
         // DELETE: api/Cities/id
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCity(int id)
         {
-            var city = await _unitOfWork.Cities.GetByIdAsync(id);
-            if (city == null)
+            try
             {
-                return NotFound();
+                await _cityService.DeleteCity(id);
+                return NoContent();
             }
-
-            _unitOfWork.Cities.Delete(city);
-            await _unitOfWork.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

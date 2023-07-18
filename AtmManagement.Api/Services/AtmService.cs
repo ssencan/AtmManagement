@@ -1,9 +1,10 @@
 ﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
 
+
 namespace AtmManagement.Api.Services
 {
-    public class AtmService : IAtmService
+    public class AtmService: IAtmService
     {
         private readonly IUnitOfWork _unitOfWork;
 

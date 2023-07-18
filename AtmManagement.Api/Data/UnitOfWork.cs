@@ -17,7 +17,7 @@ namespace AtmManagement.Api.Data
             _context = context;
         }
 
-        public IRepository<City> Cities
+        public ICityRepository Cities
         {
             get
             {

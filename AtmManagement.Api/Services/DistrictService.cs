@@ -1,8 +1,5 @@
 ﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace AtmManagement.Api.Services
 {

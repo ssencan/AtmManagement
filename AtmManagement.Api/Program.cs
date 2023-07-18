@@ -27,6 +27,7 @@ builder.Services.AddScoped<IAtmRepository, AtmRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAtmService, AtmService>();
 builder.Services.AddScoped<IDistrictService, DistrictService>();
+builder.Services.AddScoped<ICityService, CityService>();
 
 var app = builder.Build();
 
