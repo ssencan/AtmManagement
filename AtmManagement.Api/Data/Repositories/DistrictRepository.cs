@@ -1,7 +1,6 @@
 ﻿using AtmManagement.Api.Dtos;
 using AtmManagement.Api.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace AtmManagement.Api.Data.Repositories
 {
@@ -19,30 +18,30 @@ namespace AtmManagement.Api.Data.Repositories
         public async Task<IEnumerable<DistrictDto>> GetAllDistrict()
         {
             var query = from district in AtmDbContext.Districts
+                        join city in AtmDbContext.Cities on district.CityID equals city.ID
                         select new DistrictDto
                         {
                             Id = district.ID,
                             Name = district.DistrictName,
-                            CityId = district.CityID
+                            CityId = district.CityID,
+                            CityName = city.CityName
                         };
             return await query.ToListAsync();
         }
 
         public async Task<DistrictDto> GetDistrictById(int id)
         {
-            var district = await GetByIdAsync(id);
+            var query = from district in AtmDbContext.Districts 
+                        join city in AtmDbContext.Cities on district.CityID equals city.ID
+                        select new DistrictDto
+                        {
+                            Id = district.ID,
+                            Name = district.DistrictName,
+                            CityId = district.CityID,
+                            CityName = city.CityName
+                        };
 
-            if (district == null)
-                return null;
-
-            var districtDto = new DistrictDto
-            {
-                Id = district.ID,
-                Name = district.DistrictName,
-                CityId = district.CityID
-            };
-
-            return districtDto;
+            return await query.FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }
