@@ -18,15 +18,9 @@ namespace AtmManagement.Api.Controllers
 
         // GET: api/District
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DistrictDto>>> GetAllDistricts()
+        public async Task<ActionResult<IEnumerable<DistrictDto>>> GetDistricts()
         {
             var districts = await _districtService.GetAllDistrict();
-
-            if (!districts.Any())
-            {
-                return NotFound();
-            }
-
             return Ok(districts);
         }
 
@@ -38,7 +32,7 @@ namespace AtmManagement.Api.Controllers
 
             if (districtDto == null)
             {
-                return NotFound();
+                return NotFound("Kayıt bulunamadı. Id =" + id);
             }
 
             return Ok(districtDto);
@@ -58,7 +52,12 @@ namespace AtmManagement.Api.Controllers
             try
             {
                 await _districtService.UpdateDistrict(districtDto);
-                return NoContent();
+                var data = await _districtService.UpdateDistrict(districtDto);
+                if (data == null)
+                {
+                    return NotFound("Kayıt bulunamadı. Id =" + districtDto.Id);
+                }
+                return Ok(data);
             }
             catch (Exception ex)
             {
@@ -86,8 +85,12 @@ namespace AtmManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDistrict(int id)
         {
+            var data = await _districtService.DeleteDistrict(id);
             await _districtService.DeleteDistrict(id);
-
+            if (data == null)
+            {
+                return NotFound("Kayıt bulunamadı. Id =" + id);
+            }
             return NoContent();
         }
     }

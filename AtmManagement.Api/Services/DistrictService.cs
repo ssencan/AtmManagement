@@ -25,16 +25,18 @@ namespace AtmManagement.Api.Services
             return district;
         }
 
-        public async Task UpdateDistrict(DistrictDto districtDto)
+        public async Task<District> UpdateDistrict(DistrictDto districtDto)
         {
             var district = await _unitOfWork.Districts.GetByIdAsync(districtDto.Id);
 
             if (district == null)
-                return;
+                return null;
 
             district.DistrictName = districtDto.Name;
             district.CityID = districtDto.CityId;
+
             await _unitOfWork.SaveChangesAsync();
+            return district;
         }
 
         public async Task<DistrictDto> AddDistrict(DistrictDto districtDto)
@@ -49,13 +51,13 @@ namespace AtmManagement.Api.Services
             return districtDto;
         }
 
-        public async Task DeleteDistrict(int id)
+        public async Task<District> DeleteDistrict(int id)
         {
             var district = await _unitOfWork.Districts.GetByIdAsync(id);
             if (district == null)
-                throw new Exception("District not found");
-            _unitOfWork.Districts.Delete(district);
+                return null;
             await _unitOfWork.SaveChangesAsync();
+            return district;
         }
     }
 }

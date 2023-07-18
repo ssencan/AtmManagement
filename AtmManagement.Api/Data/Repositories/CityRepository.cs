@@ -46,39 +46,5 @@ namespace AtmManagement.Api.Data.Repositories
             return cityDto;
         }
 
-        public async Task UpdateCity(CityDto cityDto)
-        {
-            var city = await GetByIdAsync(cityDto.Id);
-
-            if (city == null)
-                return;
-
-            city.CityName = cityDto.Name;
-            city.PlateNumber = cityDto.PlateNumber;
-
-            Update(city);
-        }
-
-        public async Task AddCity(CityDto cityDto)
-        {
-            var city = new City
-            {
-                CityName = cityDto.Name,
-                PlateNumber = cityDto.PlateNumber
-            };
-
-            Add(city);
-            await CommitAsync();
-        }
-
-        public async Task DeleteCity(int id)
-        {
-            var city = await GetByIdAsync(id);
-
-            if (city == null)
-                return;
-
-            Delete(city);
-        }
     }
 }

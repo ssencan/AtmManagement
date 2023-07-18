@@ -1,5 +1,6 @@
 ﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Entities;
 
 namespace AtmManagement.Api.Services
 {
@@ -24,29 +25,38 @@ namespace AtmManagement.Api.Services
             return city;
         }
 
-        public async Task UpdateCity(CityDto cityDto)
+        public async Task<City> UpdateCity(CityDto cityDto)
         {
-            var city = await _unitOfWork.Cities.GetCityById(cityDto.Id);
+            var city = await _unitOfWork.Cities.GetByIdAsync(cityDto.Id);
+
             if (city == null)
-                throw new Exception("City not found");
-            await _unitOfWork.Cities.UpdateCity(cityDto);
+                return null;
+
+            city.CityName = cityDto.Name;
+            city.PlateNumber = cityDto.PlateNumber;
             await _unitOfWork.SaveChangesAsync();
+            return city;
         }
 
         public async Task<CityDto> AddCity(CityDto cityDto)
         {
-            await _unitOfWork.Cities.AddCity(cityDto);
+            var city = new City
+            {
+                CityName = cityDto.Name,
+                PlateNumber = cityDto.PlateNumber
+            };
+            await _unitOfWork.Cities.AddAsync(city);
             await _unitOfWork.SaveChangesAsync();
             return cityDto;
         }
 
-        public async Task DeleteCity(int id)
+        public async Task<City> DeleteCity(int id)
         {
-            var city = await _unitOfWork.Cities.GetCityById(id);
+            var city = await _unitOfWork.Cities.GetByIdAsync(id);
             if (city == null)
-                throw new Exception("City not found");
-            await _unitOfWork.Cities.DeleteCity(id);
+                return null;
             await _unitOfWork.SaveChangesAsync();
+            return city;
         }
     }
 }

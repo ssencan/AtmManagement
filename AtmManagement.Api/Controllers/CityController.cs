@@ -21,6 +21,7 @@ namespace AtmManagement.Api.Controllers
         public async Task<ActionResult<IEnumerable<CityDto>>> GetCities()
         {
             var cities = await _cityService.GetAllCity();
+
             return Ok(cities);
         }
 
@@ -32,7 +33,7 @@ namespace AtmManagement.Api.Controllers
 
             if (cityDto == null)
             {
-                return NotFound();
+                return NotFound("Kayıt bulunamadı. Id =" + id);
             }
 
             return Ok(cityDto);
@@ -51,7 +52,12 @@ namespace AtmManagement.Api.Controllers
             try
             {
                 await _cityService.UpdateCity(cityDto);
-                return NoContent();
+                var data = await _cityService.UpdateCity(cityDto);
+                if (data == null)
+                {
+                    return NotFound("Kayıt bulunamadı. Id =" + cityDto.Id);
+                }
+                return Ok(data);
             }
             catch (Exception ex)
             {
@@ -79,15 +85,13 @@ namespace AtmManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCity(int id)
         {
-            try
+            var data = await _cityService.DeleteCity(id);
+            await _cityService.DeleteCity(id);
+            if (data == null)
             {
-                await _cityService.DeleteCity(id);
-                return NoContent();
+                return NotFound("Kayıt bulunamadı. Id =" + id);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return NoContent();
         }
     }
 }

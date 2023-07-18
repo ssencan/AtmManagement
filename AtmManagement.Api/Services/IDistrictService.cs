@@ -1,4 +1,5 @@
 ﻿using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Entities;
 
 namespace AtmManagement.Api.Services
 {
@@ -6,8 +7,8 @@ namespace AtmManagement.Api.Services
     {
         Task<IEnumerable<DistrictDto>> GetAllDistrict();
         Task<DistrictDto> GetDistrictById(int id);
-        Task UpdateDistrict(DistrictDto districtDto);
+        Task<District> UpdateDistrict(DistrictDto districtDto);
         Task<DistrictDto> AddDistrict(DistrictDto districtDto);
-        Task DeleteDistrict(int id);
+        Task<District> DeleteDistrict(int id);
     }
 }
