@@ -7,8 +7,6 @@ namespace AtmManagement.Api.Data.Repositories
     {
         Task<IEnumerable<AtmDto>> GetAllAtm();
         Task<AtmDto> GetAtmById(int id);
-        Task UpdateAtm(AtmDto atmDto);
-        Task AddAtm(AtmDto atmDto);
-        Task DeleteAtm(int id);
+
     }
 }

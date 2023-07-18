@@ -1,4 +1,5 @@
 ﻿using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Entities;
 
 namespace AtmManagement.Api.Services
 {
@@ -6,8 +7,8 @@ namespace AtmManagement.Api.Services
     {
         Task<IEnumerable<AtmDto>> GetAllAtm();
         Task<AtmDto> GetAtmById(int id);
-        Task UpdateAtm(AtmDto atmDto);
+        Task<Atm> UpdateAtm(AtmDto atmDto);
         Task<AtmDto> AddAtm(AtmDto atmDto);
-        Task DeleteAtm(int id);
+        Task<Atm> DeleteAtm(int id);
     }
 }

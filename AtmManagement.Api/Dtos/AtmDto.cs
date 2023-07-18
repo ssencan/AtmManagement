@@ -8,6 +8,8 @@
         public double Longitude { get; set; }
         public bool IsActive { get; set; }
         public int CityID { get; set; }
+        public string CityName { get; set; }
         public int DistrictID { get; set; }
+        public string DistrictName { get; set; }
     }
 }

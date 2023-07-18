@@ -44,40 +44,5 @@ namespace AtmManagement.Api.Data.Repositories
 
             return districtDto;
         }
-
-        public async Task UpdateDistrict(DistrictDto districtDto)
-        {
-            var district = await GetByIdAsync(districtDto.Id);
-
-            if (district == null)
-                return;
-
-            district.DistrictName = districtDto.Name;
-            district.CityID = districtDto.CityId;
-
-            Update(district);
-        }
-
-        public async Task AddDistrict(DistrictDto districtDto)
-        {
-            var district = new District
-            {
-                DistrictName = districtDto.Name,
-                CityID = districtDto.CityId
-            };
-
-            Add(district);
-            await CommitAsync();
-        }
-
-        public async Task DeleteDistrict(int id)
-        {
-            var district = await GetByIdAsync(id);
-
-            if (district == null)
-                return;
-
-            Delete(district);
-        }
     }
 }

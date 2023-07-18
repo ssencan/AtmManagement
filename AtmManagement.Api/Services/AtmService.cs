@@ -1,6 +1,6 @@
 ﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
-
+using AtmManagement.Api.Entities;
 
 namespace AtmManagement.Api.Services
 {
@@ -25,34 +25,46 @@ namespace AtmManagement.Api.Services
             return atm;
         }
 
-        public async Task UpdateAtm(AtmDto atmDto)
+        public async Task<Atm> UpdateAtm(AtmDto atmDto)
         {
-            var atm = await _unitOfWork.Atms.GetAtmById(atmDto.Id);
+            var atm = await _unitOfWork.Atms.GetByIdAsync(atmDto.Id);
             if (atm == null)
-                throw new Exception("ATM not found");
-            await _unitOfWork.Atms.UpdateAtm(atmDto);
+                return null;
+            atm.AtmName = atmDto.AtmName;
+            atm.Latitude = atmDto.Latitude;
+            atm.DistrictID = atmDto.DistrictID;
+            atm.Longitude = atmDto.Longitude;
+            atm.CityID = atmDto.CityID;
+            atm.IsActive = atmDto.IsActive;
             await _unitOfWork.SaveChangesAsync();
+            return atm;
         }
 
-        public async Task<AtmDto> Add(AtmDto atmDto)
+        public async Task<AtmDto> AddAtm(AtmDto atmDto)
         {
-            await _unitOfWork.Atms.AddAtm(atmDto);
+            var atm = new Atm
+            {
+                AtmName = atmDto.AtmName,
+                Latitude = atmDto.Latitude,
+                Longitude = atmDto.Longitude,
+                IsActive = atmDto.IsActive,
+                CityID = atmDto.CityID,
+                DistrictID = atmDto.DistrictID
+            };
+            await _unitOfWork.Atms.AddAsync(atm);
             await _unitOfWork.SaveChangesAsync();
             return atmDto;
         }
 
-        public async Task DeleteAtm(int id)
+        public async Task<Atm> DeleteAtm(int id)
         {
-            var atm = await _unitOfWork.Atms.GetAtmById(id);
+            var atm = await _unitOfWork.Atms.GetByIdAsync(id);
             if (atm == null)
-                throw new Exception("ATM not found");
-            await _unitOfWork.Atms.DeleteAtm(id);
+                return null;
+            atm.IsActive = false;
             await _unitOfWork.SaveChangesAsync();
+            return atm;
         }
 
-        public Task<AtmDto> AddAtm(AtmDto atmDto)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

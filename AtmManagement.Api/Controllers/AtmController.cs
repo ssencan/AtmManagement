@@ -35,7 +35,7 @@ namespace AtmManagement.Api.Controllers
 
             if (atmDto == null)
             {
-                return NotFound();
+                return NotFound("Kayıt bulunamadı. Id =" +id);
             }
 
             return Ok(atmDto);
@@ -53,8 +53,12 @@ namespace AtmManagement.Api.Controllers
             }
             try
             {
-                await _atmService.UpdateAtm(atmDto);
-                return NoContent();
+                var data = await _atmService.UpdateAtm(atmDto);
+                if (data == null)
+                {
+                    return NotFound("Kayıt bulunamadı. Id =" + atmDto.Id);
+                }
+                return Ok(data);
             }
             catch (Exception ex)
             {
@@ -83,8 +87,11 @@ namespace AtmManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAtm(int id)
         {
-            await _atmService.DeleteAtm(id);
-
+            var data = await _atmService.DeleteAtm(id);
+            if (data == null)
+            {
+                return NotFound("Kayıt bulunamadı. Id ="+id);
+            }
             return NoContent();
         }
     }

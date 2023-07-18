@@ -1,5 +1,6 @@
 ﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
+using AtmManagement.Api.Entities;
 
 namespace AtmManagement.Api.Services
 {
@@ -26,26 +27,34 @@ namespace AtmManagement.Api.Services
 
         public async Task UpdateDistrict(DistrictDto districtDto)
         {
-            var district = await _unitOfWork.Districts.GetDistrictById(districtDto.Id);
+            var district = await _unitOfWork.Districts.GetByIdAsync(districtDto.Id);
+
             if (district == null)
-                throw new Exception("District not found");
-            await _unitOfWork.Districts.UpdateDistrict(districtDto);
+                return;
+
+            district.DistrictName = districtDto.Name;
+            district.CityID = districtDto.CityId;
             await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<DistrictDto> AddDistrict(DistrictDto districtDto)
         {
-            await _unitOfWork.Districts.AddDistrict(districtDto);
+            var district = new District
+            {
+                DistrictName = districtDto.Name,
+                CityID = districtDto.CityId
+            };
+            await _unitOfWork.Districts.AddAsync(district);
             await _unitOfWork.SaveChangesAsync();
             return districtDto;
         }
 
         public async Task DeleteDistrict(int id)
         {
-            var district = await _unitOfWork.Districts.GetDistrictById(id);
+            var district = await _unitOfWork.Districts.GetByIdAsync(id);
             if (district == null)
                 throw new Exception("District not found");
-            await _unitOfWork.Districts.DeleteDistrict(id);
+            _unitOfWork.Districts.Delete(district);
             await _unitOfWork.SaveChangesAsync();
         }
     }
