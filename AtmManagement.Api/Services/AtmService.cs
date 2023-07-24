@@ -1,4 +1,6 @@
-﻿using AtmManagement.Api.Data;
+﻿using System;
+using System.Collections.Generic;
+using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
 using AtmManagement.Api.Entities;
 
@@ -7,10 +9,13 @@ namespace AtmManagement.Api.Services
     public class AtmService: IAtmService
     {
         private readonly IUnitOfWork _unitOfWork;
+        //private readonly Dictionary<string, int> _cityMapping;
 
-        public AtmService(IUnitOfWork unitOfWork)
+        public AtmService(IUnitOfWork unitOfWork /*,Dictionary<string, List<int>> data*/)
         {
             _unitOfWork = unitOfWork;
+           // _cityMapping = CreateCityMapping(data);
+
         }
 
         public async Task<IEnumerable<AtmDto>> GetAllAtm()
@@ -27,6 +32,10 @@ namespace AtmManagement.Api.Services
 
         public async Task<Atm> UpdateAtm(AtmDto atmDto)
         {
+            if (!await IsValidAtm(atmDto))
+            {
+                throw new Exception("Invalid CityID or DistrictID.");
+            }
             var atm = await _unitOfWork.Atms.GetByIdAsync(atmDto.Id);
             if (atm == null)
                 return null;
@@ -66,5 +75,20 @@ namespace AtmManagement.Api.Services
             return atm;
         }
 
+        public async Task<bool> IsValidAtm(AtmDto atmDto)
+        {
+            var city = await _unitOfWork.Cities.GetByIdAsync(atmDto.CityID);
+            var district = await _unitOfWork.Districts.GetByIdAsync(atmDto.DistrictID);
+
+            if (city == null || district == null)
+                return false;
+
+            if (city.ID != district.CityID)
+                return false;
+
+            return true;
+        }
     }
+
 }
+

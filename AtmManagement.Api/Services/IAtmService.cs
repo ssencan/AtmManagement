@@ -10,5 +10,6 @@ namespace AtmManagement.Api.Services
         Task<Atm> UpdateAtm(AtmDto atmDto);
         Task<AtmDto> AddAtm(AtmDto atmDto);
         Task<Atm> DeleteAtm(int id);
+        Task<bool> IsValidAtm(AtmDto atmDto);
     }
 }

@@ -35,14 +35,14 @@ namespace AtmManagement.Api.Controllers
 
             if (atmDto == null)
             {
-                return NotFound("Kayıt bulunamadı. Id =" +id);
+                return NotFound("Record not found. Id =" +id);
             }
 
             return Ok(atmDto);
         }
 
         // PUT: api/Atms
-        [HttpPut]
+        [HttpPut("UpdateAtm")]
         public async Task<IActionResult> PutAtm(AtmDto atmDto)
         {
             var validator = new AtmDtoValidator();
@@ -51,12 +51,16 @@ namespace AtmManagement.Api.Controllers
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
+            if (!await _atmService.IsValidAtm(atmDto))
+            {
+                return BadRequest("The District does not belong to the provided City");
+            }
             try
             {
                 var data = await _atmService.UpdateAtm(atmDto);
                 if (data == null)
                 {
-                    return NotFound("Kayıt bulunamadı. Id =" + atmDto.Id);
+                    return NotFound("Record not found. Id =" + atmDto.Id);
                 }
                 return Ok(data);
             }
@@ -77,6 +81,10 @@ namespace AtmManagement.Api.Controllers
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
+            if (!await _atmService.IsValidAtm(atmDto))
+            {
+                return BadRequest("The District does not belong to the provided City");
+            }
 
             var result = await _atmService.AddAtm(atmDto);
 
@@ -90,7 +98,7 @@ namespace AtmManagement.Api.Controllers
             var data = await _atmService.DeleteAtm(id);
             if (data == null)
             {
-                return NotFound("Kayıt bulunamadı. Id ="+id);
+                return NotFound("Record not found. Id ="+id);
             }
             return NoContent();
         }
