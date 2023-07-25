@@ -32,10 +32,10 @@ namespace AtmManagement.Api.Services
 
         public async Task<Atm> UpdateAtm(AtmDto atmDto)
         {
-            if (!await IsValidAtm(atmDto))
-            {
-                throw new Exception("Invalid CityID or DistrictID.");
-            }
+            //if (!await IsValidAtm(atmDto))
+            //{
+            //    throw new Exception("Invalid CityID or DistrictID.");
+            //}
             var atm = await _unitOfWork.Atms.GetByIdAsync(atmDto.Id);
             if (atm == null)
                 return null;

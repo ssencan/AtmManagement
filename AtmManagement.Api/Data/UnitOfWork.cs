@@ -46,6 +46,7 @@ namespace AtmManagement.Api.Data
         public void Dispose()
         {
             _context.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public async Task SaveChangesAsync()

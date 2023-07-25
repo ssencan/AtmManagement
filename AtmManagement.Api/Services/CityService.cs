@@ -55,6 +55,7 @@ namespace AtmManagement.Api.Services
             var city = await _unitOfWork.Cities.GetByIdAsync(id);
             if (city == null)
                 return null;
+            _unitOfWork.Cities.Delete(city);
             await _unitOfWork.SaveChangesAsync();
             return city;
         }

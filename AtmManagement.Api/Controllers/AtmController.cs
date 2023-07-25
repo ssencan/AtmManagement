@@ -3,6 +3,7 @@ using AtmManagement.Api.Dtos;
 using AtmManagement.Api.Services;
 using AtmManagement.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace AtmManagement.Api.Controllers
 {
@@ -45,16 +46,18 @@ namespace AtmManagement.Api.Controllers
         [HttpPut("UpdateAtm")]
         public async Task<IActionResult> PutAtm(AtmDto atmDto)
         {
+            Console.WriteLine($"Received AtmDto: {JsonConvert.SerializeObject(atmDto)}");
+
             var validator = new AtmDtoValidator();
             var validationResult = await validator.ValidateAsync(atmDto);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
-            if (!await _atmService.IsValidAtm(atmDto))
-            {
-                return BadRequest("The District does not belong to the provided City");
-            }
+            //if (!await _atmService.IsValidAtm(atmDto))
+            //{
+            //    return BadRequest("The District does not belong to the provided City");
+            //}
             try
             {
                 var data = await _atmService.UpdateAtm(atmDto);

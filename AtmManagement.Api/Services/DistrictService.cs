@@ -56,6 +56,7 @@ namespace AtmManagement.Api.Services
             var district = await _unitOfWork.Districts.GetByIdAsync(id);
             if (district == null)
                 return null;
+            _unitOfWork.Districts.Delete(district);
             await _unitOfWork.SaveChangesAsync();
             return district;
         }
