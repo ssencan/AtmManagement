@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace AtmManagement.Api.Entities
+﻿namespace AtmManagement.Api.Entities
 {
     public class Atm
     {
@@ -15,14 +12,14 @@ namespace AtmManagement.Api.Entities
 
         public bool IsActive { get; set; }
 
-        public int CityID { get; set; } // CityID'yi foreign key olarak tanımlayın
+        public int CityID { get; set; } 
 
-        public int DistrictID { get; set; } // DistrictID'yi foreign key olarak tanımlayın
+        public int DistrictID { get; set; }
 
-        public virtual City City { get; set; } // City modeline ilişkiyi temsil eden navigasyon özelliği
+        public virtual City City { get; set; } // ATM'nin bulunduğu şehri temsil eden navigasyon özelliği.
 
-        public virtual District District { get; set; } // District modeline ilişkiyi temsil eden navigasyon özelliği
+        public virtual District District { get; set; } // ATM'nin bulunduğu ilçeyi temsil eden navigasyon özelliği.
 
-        
+
     }
 }

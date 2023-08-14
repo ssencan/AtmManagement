@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-namespace AtmManagement.Api.Entities
+﻿namespace AtmManagement.Api.Entities
 {
     public class District
     {
@@ -13,7 +11,8 @@ namespace AtmManagement.Api.Entities
        
         public virtual City City { get; set; } // İlişkiyi temsil eden navigasyon özelliği
 
-        public virtual ICollection<Atm> Atms { get; set; }
+        
+        public virtual ICollection<Atm> Atms { get; set; } //İlçeye ait ATM'lerin koleksiyonunu temsil eder.
 
     }
 }

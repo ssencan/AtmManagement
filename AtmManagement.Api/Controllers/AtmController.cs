@@ -54,10 +54,7 @@ namespace AtmManagement.Api.Controllers
             {
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
             }
-            //if (!await _atmService.IsValidAtm(atmDto))
-            //{
-            //    return BadRequest("The District does not belong to the provided City");
-            //}
+          
             try
             {
                 var data = await _atmService.UpdateAtm(atmDto);

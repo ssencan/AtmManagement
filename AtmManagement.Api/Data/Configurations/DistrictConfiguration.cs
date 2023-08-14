@@ -13,7 +13,7 @@ namespace AtmManagement.Api.Data.Configurations
             builder.Property(x=>x.CityID).IsRequired();
 
             builder
-                .HasOne(d => d.City)
+                .HasOne(d => d.City) //HasOne ve WithMany: İlişkili tablolar arasındaki ilişkileri belirler. Örneğin, City sınıfı ile District sınıfı arasındaki ilişkiyi tanımlar.
                 .WithMany(c => c.Districts)
                 .HasForeignKey(d => d.CityID)
                 .OnDelete(DeleteBehavior.NoAction);

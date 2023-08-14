@@ -1,7 +1,4 @@
 ﻿using AtmManagement.Api.Data.Repositories;
-using AtmManagement.Api.Entities;
-
-using System.Threading.Tasks;
 
 namespace AtmManagement.Api.Data
 {

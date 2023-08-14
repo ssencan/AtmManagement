@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace AtmManagement.Api.Data.Repositories
 {
@@ -8,6 +7,7 @@ namespace AtmManagement.Api.Data.Repositories
         protected readonly AtmDbContext _context;
         protected readonly DbSet<T> _dbSet;
 
+        // Repository sınıfının constructor metodu.
         public Repository(AtmDbContext context)
         {
             _context = context;

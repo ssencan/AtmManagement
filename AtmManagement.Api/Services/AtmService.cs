@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using AtmManagement.Api.Data;
+﻿using AtmManagement.Api.Data;
 using AtmManagement.Api.Dtos;
 using AtmManagement.Api.Entities;
 
@@ -9,12 +7,11 @@ namespace AtmManagement.Api.Services
     public class AtmService: IAtmService
     {
         private readonly IUnitOfWork _unitOfWork;
-        //private readonly Dictionary<string, int> _cityMapping;
-
-        public AtmService(IUnitOfWork unitOfWork /*,Dictionary<string, List<int>> data*/)
+        
+        public AtmService(IUnitOfWork unitOfWork )
         {
             _unitOfWork = unitOfWork;
-           // _cityMapping = CreateCityMapping(data);
+         
 
         }
 
@@ -32,10 +29,8 @@ namespace AtmManagement.Api.Services
 
         public async Task<Atm> UpdateAtm(AtmDto atmDto)
         {
-            //if (!await IsValidAtm(atmDto))
-            //{
-            //    throw new Exception("Invalid CityID or DistrictID.");
-            //}
+            //DTO üzerinden güncelleme işlemini gerçekleştirir ve veritabanını günceller.
+
             var atm = await _unitOfWork.Atms.GetByIdAsync(atmDto.Id);
             if (atm == null)
                 return null;
@@ -45,6 +40,7 @@ namespace AtmManagement.Api.Services
             atm.Longitude = atmDto.Longitude;
             atm.CityID = atmDto.CityID;
             atm.IsActive = atmDto.IsActive;
+            //Varolan bir nesne üzerinde işlem yapılıyor entity gönderilmiyor dto ile verileri taşır doğrudan entity kullanmaz.SavechangesAsync ile direkt yapılıyor.
             await _unitOfWork.SaveChangesAsync();
             return atm;
         }
@@ -71,6 +67,7 @@ namespace AtmManagement.Api.Services
             if (atm == null)
                 return null;
             atm.IsActive = false;
+            //Varolan bir nesne üzerinde işlem yapılıyor entity gönderilmiyor.SavechangesAsync ile direkt yapılıyor.
             await _unitOfWork.SaveChangesAsync();
             return atm;
         }

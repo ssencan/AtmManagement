@@ -8,8 +8,8 @@ namespace AtmManagement.Api.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<City> builder)
         {
-            builder.HasKey(x => x.ID);
-            builder.Property(x => x.CityName).HasMaxLength(100).IsUnicode(false);
+            builder.HasKey(x => x.ID);//Tablonun anahtar alanını (primary key) belirtir.
+            builder.Property(x => x.CityName).HasMaxLength(100).IsUnicode(false); //Property ile Tablo içindeki her bir özelliği yapılandırır.
             builder.Property(x => x.PlateNumber).IsRequired();
 
             builder
